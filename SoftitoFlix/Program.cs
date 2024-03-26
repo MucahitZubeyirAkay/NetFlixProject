@@ -1,4 +1,7 @@
-﻿namespace SoftitoFlix;
+﻿using Microsoft.EntityFrameworkCore;
+using SoftitoFlix.Data;
+
+namespace SoftitoFlix;
 
 public class Program
 {
@@ -12,6 +15,8 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
 
         var app = builder.Build();
 
