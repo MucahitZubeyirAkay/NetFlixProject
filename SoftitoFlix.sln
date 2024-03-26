@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftitoFlix", "SoftitoFlix\SoftitoFlix.csproj", "{E10DA5C4-8791-4109-AEFE-9DBB2EECBDE7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E10DA5C4-8791-4109-AEFE-9DBB2EECBDE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E10DA5C4-8791-4109-AEFE-9DBB2EECBDE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E10DA5C4-8791-4109-AEFE-9DBB2EECBDE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E10DA5C4-8791-4109-AEFE-9DBB2EECBDE7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {759739C8-5CE6-4780-B2F5-ED424637D382}
+	EndGlobalSection
+EndGlobal
