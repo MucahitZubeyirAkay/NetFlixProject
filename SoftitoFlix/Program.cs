@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
+using SoftitoFlix.Models;
 
 namespace SoftitoFlix;
 
@@ -17,7 +19,8 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
-
+        builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<SoftitoFlixContext>();
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -27,7 +30,9 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseAuthentication();
         app.UseAuthorization();
+
 
 
         app.MapControllers();

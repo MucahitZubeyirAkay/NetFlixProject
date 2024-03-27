@@ -17,13 +17,15 @@ namespace SoftitoFlix.Models
 		[Column(TypeName ="nvarchar500")]
 		public string? Description { get; set; }
 
-		[Range(0, 10)]
+        public bool Passive { get; set; }
+
+        [Range(0, 10)]
 		public float IMDBRating { get; set; }
 
 		public List<MediaCategory>? MediaCategories { get; set; }
-        public List<MediaStar>? MediaStars { get; set; }
-        public List<MediaDirector>? MediaDirectors { get; set; }
         public List<MediaRestriction>? Restrictions { get; set; }
+        public List<MediaDirector>? MediaDirectors { get; set; }
+		public List<MediaStar>? MediaStars { get; set; }
 
     }
 }
