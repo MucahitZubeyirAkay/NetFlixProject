@@ -9,7 +9,6 @@ namespace SoftitoFlix.Models
         public int Id { get; set; }
 
         [StringLength(200, MinimumLength = 1)]
-        [Column(TypeName = "nvarchar(200)")]
         public string Name { get; set; } = "";
     }
 }

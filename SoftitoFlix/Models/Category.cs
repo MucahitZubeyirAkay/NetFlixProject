@@ -9,7 +9,7 @@ namespace SoftitoFlix.Models
 
 		[StringLength(50, MinimumLength = 2)]
 		[Column(TypeName = "nvarchar(50)")]
-		public string Name { get; set; } = "";
+		public required string Name { get; set; }
 
 		public List<MediaCategory>? MediaCategories { get; set; }
 	}

@@ -17,12 +17,10 @@ namespace SoftitoFlix.Models
 
 		public DateTime ReleaseDate { get; set; }
 
-		[StringLength(200, MinimumLength =1)]	
-		[Column(TypeName = "nvarchar(200)")]
+		[StringLength(200, MinimumLength =1)]
 		public string Title { get; set; } = "";
 
         [StringLength(500)]
-        [Column(TypeName = "nvarchar(500)")]
         public string? Description { get; set; }
 
 		public long ViewCount { get; set; }

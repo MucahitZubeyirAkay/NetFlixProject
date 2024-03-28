@@ -7,14 +7,15 @@ namespace SoftitoFlix.Models
 {
 	public class ApplicationUser:IdentityUser<long>
 	{
-        [Column(TypeName ="date")]
+
         public DateTime BirthDate { get; set; }
 
         [StringLength(100, MinimumLength =2)]
-        [Column(TypeName ="nvarchar(100)")]
-        public string Name { get; set; } = "";
+        public string FullName { get; set; } = "";
 
         public bool Passive { get; set; }
+
+        public DateTime RegisterDate { get; set; }
 
     }
 }
