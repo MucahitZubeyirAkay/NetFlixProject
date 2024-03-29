@@ -30,12 +30,13 @@ namespace SoftitoFlix.Models
 		public TimeSpan Duration { get; set; }
 
 
-        [ForeignKey(nameof(MediaId))]
         public int MediaId { get; set; }
 
 
 
         public Media? Media { get; set; }
+
+		public virtual List<UserWatchEpisode>? UserWatchEpisodes { get; set; }
 
 	}
 }

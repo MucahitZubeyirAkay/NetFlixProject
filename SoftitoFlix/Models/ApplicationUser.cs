@@ -17,6 +17,12 @@ namespace SoftitoFlix.Models
 
         public DateTime RegisterDate { get; set; }
 
+
+        public virtual List<UserFavoriteMedia>? UserFavoriteMedias { get; set; }
+
+        public virtual List<UserPlan>? UserPlans { get; set; }
+
+        public virtual List<UserWatchEpisode>? UserWatchEpisodes { get; set; }
     }
 }
 

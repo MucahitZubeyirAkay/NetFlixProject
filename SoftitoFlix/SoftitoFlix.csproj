@@ -17,14 +17,19 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.28" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.28" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.28" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Models\" />
     <None Remove="Data\" />
+    <None Remove="Models\Dtos\" />
+    <None Remove="AutoMapper\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Data\" />
+    <Folder Include="Models\Dtos\" />
+    <Folder Include="AutoMapper\" />
   </ItemGroup>
 </Project>

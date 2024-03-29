@@ -5,10 +5,8 @@ namespace SoftitoFlix.Models
 {
 	public class MediaDirector
 	{
-		[ForeignKey(nameof(MediaId))]
 		public int MediaId { get; set; }
-
-		[ForeignKey(nameof(DirectorId))]
+	
 		public int DirectorId { get; set; }
 
 

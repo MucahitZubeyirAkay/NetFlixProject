@@ -5,10 +5,8 @@ namespace SoftitoFlix.Models
 {
 	public class UserWatchEpisode
 	{
-        [ForeignKey(nameof(EpisodeId))]
-        public int EpisodeId { get; set; }
+        public long EpisodeId { get; set; }
 
-        [ForeignKey(nameof(UserId))]
         public long UserId { get; set; }
 
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
@@ -21,6 +22,7 @@ public class Program
         builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
         builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<SoftitoFlixContext>();
+        builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

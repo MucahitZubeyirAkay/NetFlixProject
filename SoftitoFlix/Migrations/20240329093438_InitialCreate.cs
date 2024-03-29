@@ -31,17 +31,18 @@ namespace SoftitoFlix.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BirthDate = table.Column<DateTime>(type: "date", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Passive = table.Column<bool>(type: "bit", nullable: false),
+                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "varchar(30)", nullable: false),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -249,7 +250,7 @@ namespace SoftitoFlix.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SeasonNumber = table.Column<byte>(type: "tinyint", nullable: false),
                     EpisodeNumber = table.Column<short>(type: "smallint", nullable: false),
-                    ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReleaseDate = table.Column<DateTime>(type: "date", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     ViewCount = table.Column<long>(type: "bigint", nullable: false),
@@ -346,26 +347,26 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    PlanId = table.Column<short>(type: "smallint", nullable: false),
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "date", nullable: false),
-                    PlanId1 = table.Column<short>(type: "smallint", nullable: true),
-                    ApplicationUserId = table.Column<long>(type: "bigint", nullable: true)
+                    EndDate = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserPlans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserPlans_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
+                        name: "FK_UserPlans_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserPlans_Plans_PlanId1",
-                        column: x => x.PlanId1,
+                        name: "FK_UserPlans_Plans_PlanId",
+                        column: x => x.PlanId,
                         principalTable: "Plans",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -377,7 +378,7 @@ namespace SoftitoFlix.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MediaRestrictions", x => new { x.RestrictionId, x.MediaId });
+                    table.PrimaryKey("PK_MediaRestrictions", x => new { x.MediaId, x.RestrictionId });
                     table.ForeignKey(
                         name: "FK_MediaRestrictions_Medias_MediaId",
                         column: x => x.MediaId,
@@ -401,7 +402,7 @@ namespace SoftitoFlix.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MediaStars", x => new { x.StarId, x.MediaId });
+                    table.PrimaryKey("PK_MediaStars", x => new { x.MediaId, x.StarId });
                     table.ForeignKey(
                         name: "FK_MediaStars_Medias_MediaId",
                         column: x => x.MediaId,
@@ -473,6 +474,13 @@ namespace SoftitoFlix.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_UserName",
+                table: "AspNetUsers",
+                column: "UserName",
+                unique: true,
+                filter: "[UserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -480,9 +488,9 @@ namespace SoftitoFlix.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Episodes_MediaId",
+                name: "IX_Episodes_MediaId_SeasonNumber_EpisodeNumber",
                 table: "Episodes",
-                column: "MediaId");
+                columns: new[] { "MediaId", "SeasonNumber", "EpisodeNumber" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_MediaCategories_MediaId",
@@ -495,24 +503,24 @@ namespace SoftitoFlix.Migrations
                 column: "MediaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaRestrictions_MediaId",
+                name: "IX_MediaRestrictions_RestrictionId",
                 table: "MediaRestrictions",
-                column: "MediaId");
+                column: "RestrictionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaStars_MediaId",
+                name: "IX_MediaStars_StarId",
                 table: "MediaStars",
-                column: "MediaId");
+                column: "StarId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPlans_ApplicationUserId",
+                name: "IX_UserPlans_PlanId",
                 table: "UserPlans",
-                column: "ApplicationUserId");
+                column: "PlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPlans_PlanId1",
+                name: "IX_UserPlans_UserId",
                 table: "UserPlans",
-                column: "PlanId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsersFavoriteMedias_ApplicationUserId",

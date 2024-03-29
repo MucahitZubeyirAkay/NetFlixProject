@@ -5,10 +5,8 @@ namespace SoftitoFlix.Models
 {
 	public class MediaRestriction
 	{
-        [ForeignKey(nameof(MediaId))]
         public int MediaId { get; set; }
 
-        [ForeignKey(nameof(RestrictionId))]
         public byte RestrictionId { get; set; }
 
 

@@ -7,11 +7,9 @@ namespace SoftitoFlix.Models
 	{
 		public short Id { get; set; }
 
-		[StringLength(50, MinimumLength = 2)]
-		[Column(TypeName = "nvarchar(50)")]
-		public required string Name { get; set; }
+		public string Name { get; set; } = "";
 
-		public List<MediaCategory>? MediaCategories { get; set; }
+		public virtual List<MediaCategory>? MediaCategories { get; set; }
 	}
 }
 

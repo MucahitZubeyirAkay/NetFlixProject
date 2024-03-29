@@ -18,6 +18,7 @@ namespace SoftitoFlix.Models
         public string? Resolution { get; set; }
 
 
+		public virtual List<UserPlan>? UserPlans { get; set; }
 	}
 }
 

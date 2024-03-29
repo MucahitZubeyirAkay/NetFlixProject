@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
+using SoftitoFlix.Models.Dtos;
 
 namespace SoftitoFlix.Controllers
 {
@@ -14,111 +17,67 @@ namespace SoftitoFlix.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly SoftitoFlixContext _context;
 
-        public CategoriesController(SoftitoFlixContext context)
+        public CategoriesController(IMapper mapper, SoftitoFlixContext context)
         {
+            _mapper = mapper;
             _context = context;
         }
 
-        // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public ActionResult<List<Category>> GetCategories()
         {
-          if (_context.Categories == null)
-          {
-              return NotFound();
-          }
-            return await _context.Categories.ToListAsync();
+            List<Category> categories = _context.Categories.ToList();
+
+            return categories;
         }
 
-        // GET: api/Categories/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(short id)
+        public ActionResult<Category> GetCategory(int id)
         {
-          if (_context.Categories == null)
-          {
-              return NotFound();
-          }
-            var category = await _context.Categories.FindAsync(id);
-
-            if (category == null)
+            Category? category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if(category == null)
             {
-                return NotFound();
+                return NotFound("Aradığınız kategori bulunamadı");
             }
-
             return category;
         }
 
-        // PUT: api/Categories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(short id, Category category)
-        {
-            if (id != category.Id)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(category).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Categories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        [Authorize("Administrator")]
+        public ActionResult Post(CategoryDto categoryDto)
         {
-          if (_context.Categories == null)
-          {
-              return Problem("Entity set 'SoftitoFlixContext.Categories'  is null.");
-          }
+            Category category = _mapper.Map<Category>(categoryDto);
+
+            bool sonuc=_context.Categories.Any(c => c.Name == category.Name);
+            if(sonuc)
+            {
+                return BadRequest("Aynı kategori mevcut");
+            }
             _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
-            return CreatedAtAction("GetCategory", new { id = category.Id }, category);
+            return Ok($"{category.Name} kategorisi eklendi.");
         }
 
-        // DELETE: api/Categories/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(short id)
+        [HttpDelete]
+        [Authorize("Administrator")]
+        public ActionResult Delete(int id)
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
+            Category? category=_context.Categories.FirstOrDefault(c => c.Id == id);
 
+            if(category==null)
+            {
+                return NotFound("İşlem yapmaya çalıştığınız kategori bulunamadı!");
+            }
             _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
-            return NoContent();
+            return Ok($"{category.Name} kategorisi silindi!");
         }
 
-        private bool CategoryExists(short id)
-        {
-            return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
     }
 }

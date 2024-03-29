@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Models;
@@ -89,20 +90,71 @@ namespace SoftitoFlix.Data
                 entity.Property(p => p.Resolution).HasColumnType("varchar(20)");
             });
 
+            //UserPlan
+            builder.Entity<UserPlan>(entity =>
+            {
+                entity.Property(up => up.StartDate).HasColumnType("date");
+                entity.Property(up => up.EndDate).HasColumnType("date");
+            });
+
             //Restriction
+            builder.Entity<Restriction>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.Id).ValueGeneratedNever();
+                entity.Property(r => r.Name).IsRequired().HasColumnType("nvarchar(50)");
+            });
+
+            //Star
+            builder.Entity<Star>().Property(s => s.Name).IsRequired().HasColumnType("nvarchar(200)");
+
 
 
             #endregion
 
+            #region RelationShip
 
+            //Episode-Media
+            builder.Entity<Episode>().HasOne(e => e.Media).WithMany(m => m.Episodes).HasForeignKey(e=> e.MediaId);
+
+            //MediaCategory-Media, MediaCategory-Category
 
             builder.Entity<MediaCategory>().HasKey(mc => new { mc.CategoryId, mc.MediaId });
-            builder.Entity<MediaDirector>().HasKey(mc => new { mc.DirectorId, mc.MediaId });
-            builder.Entity<MediaRestriction>().HasKey(mc => new { mc.RestrictionId, mc.MediaId });
-            builder.Entity<MediaStar>().HasKey(mc => new { mc.StarId, mc.MediaId });
+            builder.Entity<MediaCategory>().HasOne(mc => mc.Category).WithMany(c => c.MediaCategories);
+            builder.Entity<MediaCategory>().HasOne(mc => mc.Media).WithMany(m => m.MediaCategories);
 
+            //MediaDirector-Media, MediaDirector-Director
+
+            builder.Entity<MediaDirector>().HasKey(md => new { md.DirectorId, md.MediaId });
+            builder.Entity<MediaDirector>().HasOne(md => md.Media).WithMany(m => m.MediaDirectors);
+            builder.Entity<MediaDirector>().HasOne(md => md.Director).WithMany(d => d.MediaDirectors);
+
+            //MediaRestriction-Media, MediaRestriction-Restriction
+            builder.Entity<MediaRestriction>().HasKey(mr => new { mr.MediaId, mr.RestrictionId });
+            builder.Entity<MediaRestriction>().HasOne(mr => mr.Media).WithMany(m => m.MediaRestrictions);
+            builder.Entity<MediaRestriction>().HasOne(mr => mr.Restriction).WithMany(r => r.MediaRestrictions);
+
+            //MediaStar-Media, MediaStar-Star
+            builder.Entity<MediaStar>().HasKey(md => new { md.MediaId, md.StarId });
+            builder.Entity<MediaStar>().HasOne(md => md.Media).WithMany(m => m.MediaStars);
+            builder.Entity<MediaStar>().HasOne(md => md.Star).WithMany(s => s.MediaStars);
+
+            //UserFavoriteMedia-Media, UserFavoriteMedia-ApplicationUser
             builder.Entity<UserFavoriteMedia>().HasKey(um => new { um.UserId, um.MediaId });
+            builder.Entity<UserFavoriteMedia>().HasOne(um => um.ApplicationUser).WithMany(au => au.UserFavoriteMedias);
+            builder.Entity<UserFavoriteMedia>().HasOne(um => um.Media).WithMany();
+
+            //UserPlan-User, UserPlan-Plan
+            builder.Entity<UserPlan>().HasOne(up => up.ApplicationUser).WithMany(au => au.UserPlans).HasForeignKey(up=> up.UserId);
+            builder.Entity<UserPlan>().HasOne(up => up.Plan).WithMany(p => p.UserPlans).HasForeignKey(up=> up.PlanId);
+
+            //UserWatchEpisode-User, UserWatchEpisode-Episode
             builder.Entity<UserWatchEpisode>().HasKey(ue => new { ue.UserId, ue.EpisodeId });
+            builder.Entity<UserWatchEpisode>().HasOne(ue => ue.ApplicationUser).WithMany(au => au.UserWatchEpisodes);
+            builder.Entity<UserWatchEpisode>().HasOne(ue => ue.Episode).WithMany(e => e.UserWatchEpisodes);
+            #endregion
+
+
         }
     }
 }

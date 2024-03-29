@@ -12,7 +12,7 @@ using SoftitoFlix.Data;
 namespace SoftitoFlix.Migrations
 {
     [DbContext(typeof(SoftitoFlixContext))]
-    [Migration("20240328065457_InitialCreate")]
+    [Migration("20240329093438_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -180,22 +180,23 @@ namespace SoftitoFlix.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -212,10 +213,14 @@ namespace SoftitoFlix.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("varchar(30)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("RegisterDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -236,6 +241,10 @@ namespace SoftitoFlix.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -301,7 +310,7 @@ namespace SoftitoFlix.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("ReleaseDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<byte>("SeasonNumber")
                         .HasColumnType("tinyint");
@@ -316,7 +325,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MediaId");
+                    b.HasIndex("MediaId", "SeasonNumber", "EpisodeNumber");
 
                     b.ToTable("Episodes");
                 });
@@ -381,30 +390,30 @@ namespace SoftitoFlix.Migrations
 
             modelBuilder.Entity("SoftitoFlix.Models.MediaRestriction", b =>
                 {
-                    b.Property<byte>("RestrictionId")
-                        .HasColumnType("tinyint");
-
                     b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.HasKey("RestrictionId", "MediaId");
+                    b.Property<byte>("RestrictionId")
+                        .HasColumnType("tinyint");
 
-                    b.HasIndex("MediaId");
+                    b.HasKey("MediaId", "RestrictionId");
+
+                    b.HasIndex("RestrictionId");
 
                     b.ToTable("MediaRestrictions");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.MediaStar", b =>
                 {
-                    b.Property<int>("StarId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.HasKey("StarId", "MediaId");
+                    b.Property<int>("StarId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("MediaId");
+                    b.HasKey("MediaId", "StarId");
+
+                    b.HasIndex("StarId");
 
                     b.ToTable("MediaStars");
                 });
@@ -495,29 +504,23 @@ namespace SoftitoFlix.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long?>("ApplicationUserId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<short?>("PlanId1")
+                    b.Property<short>("PlanId")
                         .HasColumnType("smallint");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("PlanId");
 
-                    b.HasIndex("PlanId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserPlans");
                 });
@@ -599,7 +602,7 @@ namespace SoftitoFlix.Migrations
             modelBuilder.Entity("SoftitoFlix.Models.Episode", b =>
                 {
                     b.HasOne("SoftitoFlix.Models.Media", "Media")
-                        .WithMany()
+                        .WithMany("Episodes")
                         .HasForeignKey("MediaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -648,7 +651,7 @@ namespace SoftitoFlix.Migrations
             modelBuilder.Entity("SoftitoFlix.Models.MediaRestriction", b =>
                 {
                     b.HasOne("SoftitoFlix.Models.Media", "Media")
-                        .WithMany("Restrictions")
+                        .WithMany("MediaRestrictions")
                         .HasForeignKey("MediaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -686,7 +689,7 @@ namespace SoftitoFlix.Migrations
             modelBuilder.Entity("SoftitoFlix.Models.UserFavoriteMedia", b =>
                 {
                     b.HasOne("SoftitoFlix.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("UserFavoriteMedias")
                         .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("SoftitoFlix.Models.Media", "Media")
@@ -702,13 +705,17 @@ namespace SoftitoFlix.Migrations
 
             modelBuilder.Entity("SoftitoFlix.Models.UserPlan", b =>
                 {
-                    b.HasOne("SoftitoFlix.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("SoftitoFlix.Models.Plan", "Plan")
-                        .WithMany()
-                        .HasForeignKey("PlanId1");
+                        .WithMany("UserPlans")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoftitoFlix.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("UserPlans")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApplicationUser");
 
@@ -718,16 +725,25 @@ namespace SoftitoFlix.Migrations
             modelBuilder.Entity("SoftitoFlix.Models.UserWatchEpisode", b =>
                 {
                     b.HasOne("SoftitoFlix.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("UserWatchEpisodes")
                         .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("SoftitoFlix.Models.Episode", "Episode")
-                        .WithMany()
+                        .WithMany("UserWatchEpisodes")
                         .HasForeignKey("EpisodeId1");
 
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Episode");
+                });
+
+            modelBuilder.Entity("SoftitoFlix.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("UserFavoriteMedias");
+
+                    b.Navigation("UserPlans");
+
+                    b.Navigation("UserWatchEpisodes");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Category", b =>
@@ -740,15 +756,27 @@ namespace SoftitoFlix.Migrations
                     b.Navigation("MediaDirectors");
                 });
 
+            modelBuilder.Entity("SoftitoFlix.Models.Episode", b =>
+                {
+                    b.Navigation("UserWatchEpisodes");
+                });
+
             modelBuilder.Entity("SoftitoFlix.Models.Media", b =>
                 {
+                    b.Navigation("Episodes");
+
                     b.Navigation("MediaCategories");
 
                     b.Navigation("MediaDirectors");
 
-                    b.Navigation("MediaStars");
+                    b.Navigation("MediaRestrictions");
 
-                    b.Navigation("Restrictions");
+                    b.Navigation("MediaStars");
+                });
+
+            modelBuilder.Entity("SoftitoFlix.Models.Plan", b =>
+                {
+                    b.Navigation("UserPlans");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Restriction", b =>

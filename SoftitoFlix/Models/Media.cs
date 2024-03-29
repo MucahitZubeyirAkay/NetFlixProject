@@ -20,10 +20,11 @@ namespace SoftitoFlix.Models
         [Range(0, 10)]
 		public float IMDBRating { get; set; }
 
-		public List<MediaCategory>? MediaCategories { get; set; }
-        public List<MediaRestriction>? Restrictions { get; set; }
-        public List<MediaDirector>? MediaDirectors { get; set; }
-		public List<MediaStar>? MediaStars { get; set; }
+		public virtual List<Episode>? Episodes { get; set; }
+		public virtual List<MediaCategory>? MediaCategories { get; set; }
+        public virtual List<MediaRestriction>? MediaRestrictions { get; set; }
+        public virtual List<MediaDirector>? MediaDirectors { get; set; }
+		public virtual List<MediaStar>? MediaStars { get; set; }
 
     }
 }

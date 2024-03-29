@@ -94,7 +94,7 @@ namespace SoftitoFlix.Controllers
             user.UserName = applicationUser.UserName;
             user.BirthDate = applicationUser.BirthDate;
             user.Email = applicationUser.Email;
-            user.Name = applicationUser.Name;
+            user.FullName = applicationUser.FullName;
 
             _signInManager.UserManager.UpdateAsync(user).Wait();
             return Ok("Güncelleme başarılı");
@@ -150,15 +150,27 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpPost("Login")]
-        public  bool Login(LogInModel logInModel)
+        public  ActionResult<bool> Login(LogInModel logInModel)
         {
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
             ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result;
 
-            if (applicationUser == null || applicationUser.Passive ==true)
+            if (applicationUser == null)
             {
+                return NotFound("Kullanıcı bulunamadı");
+            }
+
+            if(_context.UserPlans.Where(u=> u.UserId==applicationUser.Id && u.EndDate>=DateTime.Today).Any()==false)
+            {
+                applicationUser.Passive = true;
+                _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
                 return false;
             }
+            if(applicationUser.Passive == true)
+            {
+                return Content("Kullanıcı üyeliği pasif durumda");
+            }
+
 
             signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
 

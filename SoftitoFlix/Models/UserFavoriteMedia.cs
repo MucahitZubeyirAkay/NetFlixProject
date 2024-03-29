@@ -5,10 +5,8 @@ namespace SoftitoFlix.Models
 {
 	public class UserFavoriteMedia
 	{
-		[ForeignKey(nameof(MediaId))]
 		public int MediaId { get; set; }
 
-		[ForeignKey(nameof(UserId))]
 		public long UserId { get; set; }
 
 
