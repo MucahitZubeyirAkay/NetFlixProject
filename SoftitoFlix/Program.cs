@@ -20,7 +20,7 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
-        builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        builder.Services.AddDefaultIdentity<ApplicationUser>()
                 .AddEntityFrameworkStores<SoftitoFlixContext>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         var app = builder.Build();

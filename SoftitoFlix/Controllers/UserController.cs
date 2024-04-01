@@ -160,19 +160,37 @@ namespace SoftitoFlix.Controllers
                 return NotFound("Kullanıcı bulunamadı");
             }
 
-            if(_context.UserPlans.Where(u=> u.UserId==applicationUser.Id && u.EndDate>=DateTime.Today).Any()==false)
+            if (_context.UserPlans.Where(u => u.UserId == applicationUser.Id && u.EndDate >= DateTime.Today).Any() == false)
             {
                 applicationUser.Passive = true;
                 _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
                 return false;
             }
-            if(applicationUser.Passive == true)
+
+
+            if (applicationUser.Passive == true)
             {
                 return Content("Kullanıcı üyeliği pasif durumda");
             }
 
 
             signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
+
+            if(signInResult.Succeeded==true)
+            {
+                var mediaCategory = _context.UsersFavoriteMedias.Where(u => u.UserId == applicationUser.Id).Include(u => u.Media!).ThenInclude(u => u.MediaCategories).ToList()
+                .SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
+
+                if (mediaCategory != null)
+                {
+                    IQueryable<int> userWatchEpisode = _context.UsersWatchEpisodes.Where(u => u.UserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
+
+                    IQueryable<Media> mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategory.Key)).Where(m => userWatchEpisode.Contains(m.Id) == false);
+
+                    //Gelen önerileri burda yaş kısıtlamasına göre kontrol et.
+                }
+
+            }
 
 
             return signInResult.Succeeded;

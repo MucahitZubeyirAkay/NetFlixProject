@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Restrictions/5
         [HttpPut("{id}")]
+        [Authorize("Administrator")]
         public ActionResult PutRestriction(byte id, RestrictionDto restrictionDto)
         {
             Restriction? restriction = _context.Restrictions.Find(id);
@@ -86,6 +88,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Restrictions
         [HttpPost]
+        [Authorize("Administrator")]
         public ActionResult<Restriction> PostRestriction(int id,RestrictionDto restrictionDto)
         {
             if(restrictionDto == null)
@@ -130,6 +133,7 @@ namespace SoftitoFlix.Controllers
 
         //DELETE: api/Restrictions/5
         [HttpDelete("{id}")]
+        [Authorize("Administrator")]
         public ActionResult DeleteRestriction(byte id)
         {
 
