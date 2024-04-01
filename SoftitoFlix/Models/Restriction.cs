@@ -8,11 +8,9 @@ namespace SoftitoFlix.Models
 	{
 		public byte Id { get; set; }
 
-		[StringLength(50)]
 		public string Name { get; set; } = "";
 
-
-		public virtual List<MediaRestriction>? MediaRestrictions { get; set; }
+        public virtual List<MediaRestriction>? MediaRestrictions { get; set; }
 	}
 }
 

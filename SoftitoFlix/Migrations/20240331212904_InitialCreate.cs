@@ -60,7 +60,7 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<short>(type: "smallint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,7 +73,8 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Surname = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,7 +117,7 @@ namespace SoftitoFlix.Migrations
                 columns: table => new
                 {
                     Id = table.Column<byte>(type: "tinyint", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,7 +130,8 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Surname = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -421,9 +423,8 @@ namespace SoftitoFlix.Migrations
                 name: "UsersWatchEpisodes",
                 columns: table => new
                 {
-                    EpisodeId = table.Column<int>(type: "int", nullable: false),
+                    EpisodeId = table.Column<long>(type: "bigint", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    EpisodeId1 = table.Column<long>(type: "bigint", nullable: true),
                     ApplicationUserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -435,10 +436,11 @@ namespace SoftitoFlix.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_UsersWatchEpisodes_Episodes_EpisodeId1",
-                        column: x => x.EpisodeId1,
+                        name: "FK_UsersWatchEpisodes_Episodes_EpisodeId",
+                        column: x => x.EpisodeId,
                         principalTable: "Episodes",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -538,9 +540,9 @@ namespace SoftitoFlix.Migrations
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsersWatchEpisodes_EpisodeId1",
+                name: "IX_UsersWatchEpisodes_EpisodeId",
                 table: "UsersWatchEpisodes",
-                column: "EpisodeId1");
+                column: "EpisodeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

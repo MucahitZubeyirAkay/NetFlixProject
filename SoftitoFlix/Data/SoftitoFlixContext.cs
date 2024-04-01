@@ -6,7 +6,7 @@ using SoftitoFlix.Models;
 
 namespace SoftitoFlix.Data
 {
-	public class SoftitoFlixContext:IdentityDbContext<ApplicationUser, ApplicationRole, long>
+	public class SoftitoFlixContext:IdentityDbContext<ApplicationUser,ApplicationRole, long>
 	{
 		public SoftitoFlixContext(DbContextOptions<SoftitoFlixContext> options): base(options)
 		{
@@ -64,7 +64,11 @@ namespace SoftitoFlix.Data
             builder.Entity<Category>().Property(c => c.Name).IsRequired().HasColumnType("nvarchar(50)");
 
             //Director
-            builder.Entity<Director>().Property(d => d.Name).IsRequired().HasColumnType("nvarchar(200)");
+            builder.Entity<Director>(entity =>
+            { 
+            entity.Property(d => d.Name).IsRequired().HasColumnType("nvarchar(200)");
+            entity.Property(d => d.Surname).IsRequired().HasColumnType("nvarchar(200)");
+            });
 
             //Episode
             builder.Entity<Episode>(entity =>
@@ -106,7 +110,11 @@ namespace SoftitoFlix.Data
             });
 
             //Star
-            builder.Entity<Star>().Property(s => s.Name).IsRequired().HasColumnType("nvarchar(200)");
+            builder.Entity<Star>(entity =>
+            {
+                entity.Property(s => s.Name).IsRequired().HasColumnType("nvarchar(200)");
+                entity.Property(s => s.Surname).IsRequired().HasColumnType("nvarchar(200)");
+            });
 
 
 

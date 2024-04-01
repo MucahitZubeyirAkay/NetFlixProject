@@ -10,6 +10,8 @@ namespace SoftitoFlix.AutoMapper
 		public AutoMapperConfig()
 		{
 			CreateMap<Category, CategoryDto>().ReverseMap();
+			CreateMap<Director, DirectorDto>().ReverseMap();
+			CreateMap<Restriction, RestrictionDto>().ReverseMap();
 		}
 	}
 }

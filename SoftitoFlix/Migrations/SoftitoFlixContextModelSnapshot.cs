@@ -257,7 +257,6 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
@@ -274,6 +273,11 @@ namespace SoftitoFlix.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Surname")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -448,7 +452,6 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
@@ -465,6 +468,11 @@ namespace SoftitoFlix.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Surname")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -528,20 +536,17 @@ namespace SoftitoFlix.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("EpisodeId")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("ApplicationUserId")
+                    b.Property<long>("EpisodeId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("EpisodeId1")
+                    b.Property<long?>("ApplicationUserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("UserId", "EpisodeId");
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("EpisodeId1");
+                    b.HasIndex("EpisodeId");
 
                     b.ToTable("UsersWatchEpisodes");
                 });
@@ -728,7 +733,9 @@ namespace SoftitoFlix.Migrations
 
                     b.HasOne("SoftitoFlix.Models.Episode", "Episode")
                         .WithMany("UserWatchEpisodes")
-                        .HasForeignKey("EpisodeId1");
+                        .HasForeignKey("EpisodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApplicationUser");
 

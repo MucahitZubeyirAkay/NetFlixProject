@@ -1,11 +1,8 @@
-﻿using System;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace SoftitoFlix.Models
 {
-	public class ApplicationRole:IdentityRole<long>
-	{
-       
+    public class ApplicationRole:IdentityRole<long>
+    {
     }
 }
-

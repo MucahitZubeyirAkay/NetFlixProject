@@ -27,9 +27,7 @@
     <None Remove="AutoMapper\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <Folder Include="Data\" />
-    <Folder Include="Models\Dtos\" />
     <Folder Include="AutoMapper\" />
   </ItemGroup>
 </Project>
