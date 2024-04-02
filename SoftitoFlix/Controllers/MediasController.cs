@@ -31,9 +31,9 @@ namespace SoftitoFlix.Controllers
         [Authorize]
         public ActionResult<List<Media>> GetMedias()
         {
-            List<Media> media = _context.Medias.ToList();
+            List<Media> media = _context.Medias.Where(m => m.Passive == false).ToList();
 
-            if(media==null)
+            if (media == null)
             {
                 return NotFound("Media bulunamadı!");
             }
@@ -46,14 +46,14 @@ namespace SoftitoFlix.Controllers
         [Authorize]
         public ActionResult<Media> GetMedia(int id)
         {
-          if(id==0)
+            if (id == 0)
             {
                 return BadRequest("Id alanı 0 yada boş olamaz!");
             }
 
             Media? media = _context.Medias.Find(id);
 
-            if(media == null)
+            if (media == null || media.Passive == true)
             {
                 return NotFound("Aradığınız media bulunamadı!");
             }
@@ -64,12 +64,12 @@ namespace SoftitoFlix.Controllers
         // PUT: api/Medias/5
         [HttpPut("{id}")]
         [Authorize("Administrator")]
-        public ActionResult PutMedia(int id, MediaDto mediaDto)
+        public ActionResult PutMedia(int id, MediaUpdateDto mediaDto)
         {
-            
-            Media? media =_context.Medias.Find(id);
 
-            if (media==null)
+            Media? media = _context.Medias.Find(id);
+
+            if (media == null)
             {
                 return NotFound("Güncelleme yapmak istediğiniz media bulunamadı!");
             }
@@ -77,7 +77,6 @@ namespace SoftitoFlix.Controllers
             media.Name = mediaDto.Name;
             media.Description = mediaDto.Description;
             media.IMDBRating = mediaDto.IMDBRating;
-            media.Passive = mediaDto.Passive;
 
             try
             {
@@ -98,19 +97,29 @@ namespace SoftitoFlix.Controllers
             return Ok("Güncelleme işlemi başarılı!");
         }
 
+        [HttpPut("{updateId}")]
+        [Authorize("Administrator")]
+        public ActionResult<Media> PutPassiveMediaActive(int id)
+        {
+            Media? media = _context.Medias.Find(id);
+
+            if(media==null)
+            {
+                return NotFound("Güncelleme yapmak istediğiniz Media bulunamadı!");
+            }
+            if(media.Passive == false)
+            {
+                return Problem("Medianın durumu zaten aktif!");
+            }
+            return Ok($"{media.Id} Id'li {media.Name} mediası aktif edildi.");
+        }
+
         // POST: api/Medias
         [HttpPost]
         [Authorize("Administrator")]
         public ActionResult<Media> PostMedia(MediaDto mediaDto)
         {
             Media media = _mapper.Map<Media>(mediaDto);
-
-            bool sonuc = _context.Medias.Any(m => m.Name == mediaDto.Name);
-
-            if(sonuc)
-            {
-                return BadRequest("Olan filmi ekleyemezsin!");
-            }
 
             _context.Medias.Add(media);
             _context.SaveChanges();
@@ -125,12 +134,12 @@ namespace SoftitoFlix.Controllers
         {
            Media? media = _context.Medias.Find(id);
 
-           if(media==null||media.Passive==false)
+           if(media==null||media.Passive==true)
            {
                return NotFound("Silmeye çalıştığınız media bulunamadı!");
            }
 
-            media.Passive = false;
+            media.Passive = true;
             _context.Medias.Update(media);
             _context.SaveChanges();
 

@@ -21,8 +21,10 @@ public class Program
 
         builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
         builder.Services.AddDefaultIdentity<ApplicationUser>()
+            .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SoftitoFlixContext>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        //builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

@@ -13,6 +13,7 @@ namespace SoftitoFlix.AutoMapper
 			CreateMap<Director, DirectorDto>().ReverseMap();
 			CreateMap<Restriction, RestrictionDto>().ReverseMap();
 			CreateMap<Media, MediaDto>().ReverseMap();
+			CreateMap<Episode, EpisodeDto>().ReverseMap();
 		}
 	}
 }

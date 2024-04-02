@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SoftitoFlix.Models
 {
@@ -9,18 +10,14 @@ namespace SoftitoFlix.Models
 
 		public long Id { get; set; }
 
-		[Range(0, byte.MaxValue)]
 		public byte SeasonNumber { get; set; }
 
-		[Range(0, 366)]
 		public short EpisodeNumber { get; set; }
 
 		public DateTime ReleaseDate { get; set; }
 
-		[StringLength(200, MinimumLength =1)]
 		public string Title { get; set; } = "";
 
-        [StringLength(500)]
         public string? Description { get; set; }
 
 		public long ViewCount { get; set; }
@@ -32,7 +29,7 @@ namespace SoftitoFlix.Models
 
         public int MediaId { get; set; }
 
-
+		[JsonIgnore]
 
         public Media? Media { get; set; }
 

@@ -105,17 +105,25 @@ namespace SoftitoFlix.Controllers
         [HttpPost]
         public ActionResult<string> PostApplicationUser(ApplicationUser applicationUser, string password)
         {
-            if(User.Identity!.IsAuthenticated==true)
+
+            if(User.Identity!.IsAuthenticated==false)
             {
                 return BadRequest();
             }
 
             IdentityResult identityResult = _signInManager.UserManager.CreateAsync(applicationUser,password).Result; //Identityresult Metot başarısız olursa metottan dönen cevabı(hatayı) dönmemizi sağlar.
 
+
             if(identityResult != IdentityResult.Success)
             {
                 return identityResult.Errors.FirstOrDefault()!.Description;
             }
+
+            Claim claim;
+
+            claim = new Claim("BirthDate", applicationUser.BirthDate.ToString(), ClaimValueTypes.Date);
+            _signInManager.UserManager.AddClaimAsync(applicationUser, claim).Wait();
+
             return Ok();
         }
 
@@ -165,7 +173,7 @@ namespace SoftitoFlix.Controllers
                 applicationUser.Passive = true;
                 _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
                 return false;
-            }
+            }       
 
 
             if (applicationUser.Passive == true)
@@ -176,7 +184,7 @@ namespace SoftitoFlix.Controllers
 
             signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
 
-            if(signInResult.Succeeded==true)
+            /*if(signInResult.Succeeded==true)
             {
                 var mediaCategory = _context.UsersFavoriteMedias.Where(u => u.UserId == applicationUser.Id).Include(u => u.Media!).ThenInclude(u => u.MediaCategories).ToList()
                 .SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
@@ -190,8 +198,7 @@ namespace SoftitoFlix.Controllers
                     //Gelen önerileri burda yaş kısıtlamasına göre kontrol et.
                 }
 
-            }
-
+            }*/
 
             return signInResult.Succeeded;
         }

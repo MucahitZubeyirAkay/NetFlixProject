@@ -131,24 +131,6 @@ namespace SoftitoFlix.Controllers
             return Ok($"{restriction.Id} Id'li, {restriction.Name} adlı kısıtlama eklendi.");
         }
 
-        //DELETE: api/Restrictions/5
-        [HttpDelete("{id}")]
-        [Authorize("Administrator")]
-        public ActionResult DeleteRestriction(byte id)
-        {
-
-            var restriction = _context.Restrictions.Find(id);
-            if (restriction == null)
-            {
-                return NotFound();
-            }
-
-            _context.Restrictions.Remove(restriction);
-            _context.SaveChanges();
-
-            return Ok($"{restriction.Name} adlı restriction silindi!");
-        }
-
         private bool RestrictionExists(byte id)
         {
             return (_context.Restrictions?.Any(e => e.Id == id)).GetValueOrDefault();
