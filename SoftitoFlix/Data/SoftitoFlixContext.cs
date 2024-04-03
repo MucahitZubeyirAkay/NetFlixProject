@@ -157,8 +157,8 @@ namespace SoftitoFlix.Data
             builder.Entity<UserPlan>().HasOne(up => up.Plan).WithMany(p => p.UserPlans).HasForeignKey(up=> up.PlanId);
 
             //UserWatchEpisode-User, UserWatchEpisode-Episode
-            builder.Entity<UserWatchEpisode>().HasKey(ue => new { ue.UserId, ue.EpisodeId });
-            builder.Entity<UserWatchEpisode>().HasOne(ue => ue.ApplicationUser).WithMany(au => au.UserWatchEpisodes);
+            builder.Entity<UserWatchEpisode>().HasKey(ue => new { ue.ApplicationUserId, ue.EpisodeId });
+            builder.Entity<UserWatchEpisode>().HasOne(ue =>     ue.ApplicationUser).WithMany(au => au.UserWatchEpisodes);
             builder.Entity<UserWatchEpisode>().HasOne(ue => ue.Episode).WithMany(e => e.UserWatchEpisodes);
             #endregion
 

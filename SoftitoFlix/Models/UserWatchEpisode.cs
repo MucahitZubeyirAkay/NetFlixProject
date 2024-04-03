@@ -7,7 +7,7 @@ namespace SoftitoFlix.Models
 	{
         public long EpisodeId { get; set; }
 
-        public long UserId { get; set; }
+        public long ApplicationUserId { get; set; }
 
 
         public Episode? Episode { get; set; }

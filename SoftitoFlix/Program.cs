@@ -19,12 +19,12 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationWindowsDatabase")));
+        builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
         builder.Services.AddDefaultIdentity<ApplicationUser>()
             .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SoftitoFlixContext>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);//Program çalışıtğında loopa girmesini engelliyor.
+        //builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);//Program çalışıtğında loopa girmesini engelliyor.
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

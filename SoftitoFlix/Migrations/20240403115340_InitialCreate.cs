@@ -73,8 +73,8 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(200)", nullable: false),
+                    Surname = table.Column<string>(type: "nvarchar(200)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,8 +87,8 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(200)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", nullable: true),
                     Passive = table.Column<bool>(type: "bit", nullable: false),
                     IMDBRating = table.Column<float>(type: "real", nullable: false)
                 },
@@ -130,8 +130,8 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(200)", nullable: false),
+                    Surname = table.Column<string>(type: "nvarchar(200)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -253,8 +253,8 @@ namespace SoftitoFlix.Migrations
                     SeasonNumber = table.Column<byte>(type: "tinyint", nullable: false),
                     EpisodeNumber = table.Column<short>(type: "smallint", nullable: false),
                     ReleaseDate = table.Column<DateTime>(type: "date", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(500)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", nullable: true),
                     ViewCount = table.Column<long>(type: "bigint", nullable: false),
                     Passive = table.Column<bool>(type: "bit", nullable: false),
                     Duration = table.Column<TimeSpan>(type: "time", nullable: false),
@@ -424,17 +424,17 @@ namespace SoftitoFlix.Migrations
                 columns: table => new
                 {
                     EpisodeId = table.Column<long>(type: "bigint", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    ApplicationUserId = table.Column<long>(type: "bigint", nullable: true)
+                    ApplicationUserId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UsersWatchEpisodes", x => new { x.UserId, x.EpisodeId });
+                    table.PrimaryKey("PK_UsersWatchEpisodes", x => new { x.ApplicationUserId, x.EpisodeId });
                     table.ForeignKey(
                         name: "FK_UsersWatchEpisodes_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UsersWatchEpisodes_Episodes_EpisodeId",
                         column: x => x.EpisodeId,
@@ -533,11 +533,6 @@ namespace SoftitoFlix.Migrations
                 name: "IX_UsersFavoriteMedias_MediaId",
                 table: "UsersFavoriteMedias",
                 column: "MediaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UsersWatchEpisodes_ApplicationUserId",
-                table: "UsersWatchEpisodes",
-                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsersWatchEpisodes_EpisodeId",

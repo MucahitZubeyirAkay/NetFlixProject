@@ -136,13 +136,13 @@ namespace SoftitoFlix.Controllers
 
             long userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            if(_context.UsersWatchEpisodes.Any(u=> u.EpisodeId== watchId && u.UserId == userId))
+            if(_context.UsersWatchEpisodes.Any(u=> u.EpisodeId== watchId && u.ApplicationUserId == userId))
             {
                 _context.SaveChanges();
                 return episode;
             }
 
-            userWatched.UserId = userId;
+            userWatched.ApplicationUserId = userId;
 
             userWatched.EpisodeId = watchId;
 

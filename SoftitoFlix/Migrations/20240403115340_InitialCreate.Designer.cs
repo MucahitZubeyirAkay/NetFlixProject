@@ -12,7 +12,7 @@ using SoftitoFlix.Data;
 namespace SoftitoFlix.Migrations
 {
     [DbContext(typeof(SoftitoFlixContext))]
-    [Migration("20240331212904_InitialCreate")]
+    [Migration("20240403115340_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -276,12 +276,10 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
@@ -298,7 +296,6 @@ namespace SoftitoFlix.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<TimeSpan>("Duration")
@@ -321,8 +318,7 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<long>("ViewCount")
                         .HasColumnType("bigint");
@@ -343,7 +339,6 @@ namespace SoftitoFlix.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<float>("IMDBRating")
@@ -351,7 +346,6 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("Passive")
@@ -471,12 +465,10 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
@@ -535,18 +527,13 @@ namespace SoftitoFlix.Migrations
 
             modelBuilder.Entity("SoftitoFlix.Models.UserWatchEpisode", b =>
                 {
-                    b.Property<long>("UserId")
+                    b.Property<long>("ApplicationUserId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("EpisodeId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ApplicationUserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("UserId", "EpisodeId");
-
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("ApplicationUserId", "EpisodeId");
 
                     b.HasIndex("EpisodeId");
 
@@ -731,7 +718,9 @@ namespace SoftitoFlix.Migrations
                 {
                     b.HasOne("SoftitoFlix.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("UserWatchEpisodes")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SoftitoFlix.Models.Episode", "Episode")
                         .WithMany("UserWatchEpisodes")
