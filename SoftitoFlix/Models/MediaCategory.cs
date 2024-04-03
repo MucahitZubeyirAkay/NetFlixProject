@@ -12,7 +12,6 @@ namespace SoftitoFlix.Models
 		public short CategoryId { get; set; }
 
 
-		[JsonIgnore]
 		public Media? Media { get; set; }
 
 		public Category? Category { get; set; }

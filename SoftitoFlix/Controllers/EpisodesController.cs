@@ -32,9 +32,6 @@ namespace SoftitoFlix.Controllers
         [Authorize]
         public ActionResult<List<Episode>> GetEpisodes() //Kontrol et.
         {
-            /*DateTime userBirth = DateTime.Parse(User.FindFirstValue(ClaimTypes.DateOfBirth));
-            TimeSpan age = DateTime.Now - userBirth;
-            int ageInYears = (int)(age.TotalDays / 365.25);*/
 
             var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
 
@@ -45,22 +42,44 @@ namespace SoftitoFlix.Controllers
             }
 
             TimeSpan age = DateTime.Now - userBirth;
+
             int ageInYears = (int)(age.TotalDays / 365.25);
 
-            List<Episode> episodeList = _context.Episodes.Where(e => e.Passive == false).Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions!.Where(mr => mr.RestrictionId <= ageInYears)).ToList();
+            var episodes = _context.Episodes.Where(e=>e.Passive==false).Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
 
+            if(episodes==null || episodes.Count==0)
+            {
+                return NotFound("Episode bulunamadı!");
+            }
 
-            return episodeList;
+            return episodes;
         }
 
         // GET: api/Episodes/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<Episode> GetEpisode(long id)
         {
 
-            var episode = _context.Episodes.Find(id);
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
 
-            if (episode == null || episode.Passive == true)
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
+            {
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
+            }
+
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            // var episode = _context.Episodes.Find(id);
+
+           var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e=> e.Id==id);
+
+
+
+            if (episode == null || episode.Passive == false)
             {
                 return NotFound("Aradığınız episode bulunamadı!");
             }
@@ -68,18 +87,33 @@ namespace SoftitoFlix.Controllers
             return episode;
         }
 
-        [HttpGet("{watchId}")]
+        [HttpGet("GetWatch/{id}")]
         [Authorize]
-        public ActionResult<Episode> GetWatch(int id)
+        public ActionResult<Episode> GetWatch(int watchId)
         {
-            Episode? episode = _context.Episodes.Find(id);
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
+
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
+            {
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
+            }
+
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            // var episode = _context.Episodes.Find(id);
+
+            var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e => e.Id == watchId);
+
 
             if(episode == null || episode.Passive==true)
             {
                 return NotFound("Bölüm bulunamadı!");
             }
 
-            episode.ViewCount = episode.ViewCount++;
+            episode.ViewCount += 1;
 
             _context.Episodes.Update(episode);
             
@@ -88,7 +122,7 @@ namespace SoftitoFlix.Controllers
 
             long userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            if(_context.UsersWatchEpisodes.Any(u=> u.EpisodeId==id && u.UserId == userId))
+            if(_context.UsersWatchEpisodes.Any(u=> u.EpisodeId== watchId && u.UserId == userId))
             {
                 _context.SaveChanges();
                 return episode;
@@ -96,9 +130,9 @@ namespace SoftitoFlix.Controllers
 
             userWatched.UserId = userId;
 
-            userWatched.EpisodeId = id;
+            userWatched.EpisodeId = watchId;
 
-            _context.UsersWatchEpisodes.Update(userWatched);
+            _context.UsersWatchEpisodes.Update(userWatched);   //Burası çalışmıyor tabloda ekstra ApplicationUserId var onu kaldır.
             _context.SaveChanges();
 
             

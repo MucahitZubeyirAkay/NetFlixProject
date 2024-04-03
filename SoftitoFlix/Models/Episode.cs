@@ -29,8 +29,6 @@ namespace SoftitoFlix.Models
 
         public int MediaId { get; set; }
 
-		[JsonIgnore]
-
         public Media? Media { get; set; }
 
 		public virtual List<UserWatchEpisode>? UserWatchEpisodes { get; set; }

@@ -106,10 +106,10 @@ namespace SoftitoFlix.Controllers
         public ActionResult<string> PostApplicationUser(ApplicationUser applicationUser, string password)
         {
 
-            if(User.Identity!.IsAuthenticated==false)
-            {
-                return BadRequest();
-            }
+            //if(User.Identity!.IsAuthenticated==false)
+            //{
+            //    return BadRequest();
+            //}
 
             IdentityResult identityResult = _signInManager.UserManager.CreateAsync(applicationUser,password).Result; //Identityresult Metot başarısız olursa metottan dönen cevabı(hatayı) dönmemizi sağlar.
 
