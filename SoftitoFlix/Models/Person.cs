@@ -13,4 +13,3 @@ namespace SoftitoFlix.Models
         public string Surname { get; set; } = "";
     }
 }
-

@@ -45,10 +45,16 @@ namespace SoftitoFlix.Controllers
 
             int ageInYears = (int)(age.TotalDays / 365.25);
 
+            
             var episodes = _context.Episodes.Where(e=>e.Passive==false).Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
 
-            if(episodes==null || episodes.Count==0)
+
+            if(episodes==null)
             {
+                if (_context.Episodes.Any(e => e.Passive == false))
+                {
+                    return Problem("Aradığınız içeri izlemek için yaşınız uygun değil.");
+                }
                 return NotFound("Episode bulunamadı!");
             }
 
@@ -75,12 +81,16 @@ namespace SoftitoFlix.Controllers
 
             // var episode = _context.Episodes.Find(id);
 
-           var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e=> e.Id==id);
+           var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e=> e.Id==id);
 
 
 
-            if (episode == null || episode.Passive == false)
+            if (episode == null)
             {
+               if(_context.Episodes.Any(e=> e.Id==id && e.Passive==false))
+                {
+                    return Problem("Aradığınız episode yaşınız için uygun değil. Bu episode için erişim hakkınız yok.");
+                }
                 return NotFound("Aradığınız episode bulunamadı!");
             }
 
@@ -105,12 +115,16 @@ namespace SoftitoFlix.Controllers
 
             // var episode = _context.Episodes.Find(id);
 
-            var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e => e.Id == watchId);
+            var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e => e.Id == watchId);
 
 
-            if(episode == null || episode.Passive==true)
+            if (episode == null)
             {
-                return NotFound("Bölüm bulunamadı!");
+                if (_context.Episodes.Any(e => e.Id == watchId && e.Passive==false))
+                {
+                    return Problem("Aradığınız episode yaşınız için uygun değil. Bu episode için erişim hakkınız yok.");
+                }
+                return NotFound("Aradığınız episode bulunamadı!");
             }
 
             episode.ViewCount += 1;

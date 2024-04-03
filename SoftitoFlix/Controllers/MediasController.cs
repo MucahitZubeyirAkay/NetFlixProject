@@ -31,10 +31,27 @@ namespace SoftitoFlix.Controllers
         [Authorize]
         public ActionResult<List<Media>> GetMedias()
         {
-            List<Media> media = _context.Medias.Where(m => m.Passive == false).ToList();
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
+
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
+            {
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
+            }
+
+
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
 
             if (media == null)
             {
+                if (_context.Medias.Any(m=> m.Passive == false))
+                {
+                    return Problem("Aradığınız media yaşınız için uygun değil!Bu media için erişim hakkınız yok");
+                }
                 return NotFound("Media bulunamadı!");
             }
 
@@ -46,15 +63,29 @@ namespace SoftitoFlix.Controllers
         [Authorize]
         public ActionResult<Media> GetMedia(int id)
         {
-            if (id == 0)
+           
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
+
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
             {
-                return BadRequest("Id alanı 0 yada boş olamaz!");
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
             }
 
-            Media? media = _context.Medias.Find(id);
 
-            if (media == null || media.Passive == true)
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(m=> m.Id == id);
+
+
+            if (media == null)
             {
+                if(_context.Medias.Any(m=> m.Id==id && m.Passive==false))
+                {
+                    return Problem("Aradığınız media yaşınız için uygun değil!Bu media için erişim hakkınız yok");
+                }
                 return NotFound("Aradığınız media bulunamadı!");
             }
 
