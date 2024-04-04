@@ -5,7 +5,6 @@ namespace SoftitoFlix.Models.Dtos
 {
 	public class MediaDto
 	{
-        public int Id { get; set; }
 
         [StringLength(200, MinimumLength = 1)]
         public string Name { get; set; } = "";

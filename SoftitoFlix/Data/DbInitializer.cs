@@ -7,10 +7,13 @@ namespace SoftitoFlix.Data
 {
     public class DbInitializer
     {
-        public DbInitializer(SoftitoFlixContext? context, UserManager<ApplicationUser>? userManager)
+        public DbInitializer(SoftitoFlixContext? context, RoleManager<ApplicationRole>? roleManager  , UserManager<ApplicationUser>? userManager)
         {
             Restriction restriction;
             ApplicationUser applicationUser;
+            ApplicationRole applicationRole;
+            Plan plan;
+            UserPlan userPlan;
 
             if( context != null )
             {
@@ -54,14 +57,37 @@ namespace SoftitoFlix.Data
                     context.Restrictions.Add(restriction);
                 }
 
+                if(context.Plans!.Count()==0)
+                {
+                    plan = new Plan();
+                    plan.Name = "Admin";
+                    plan.Price = 999999999999999999;
+                    
+                    context.Plans.Add(plan);
+
+                }
+
                 context.SaveChanges();
+
+                if(roleManager != null)
+                {
+                    if(roleManager.Roles.Count() == 0)
+                    {
+                        applicationRole = new ApplicationRole();
+                        applicationRole.Name = "Administrator";
+
+                        roleManager.CreateAsync(applicationRole).Wait();
+
+                    }
+                    
+                }
 
                 if(userManager != null)
                 {
                     if(userManager.Users.Count() == 0)
                     {
                         applicationUser = new ApplicationUser();
-                        applicationUser.BirthDate = new DateTime(2024, 01, 01);
+                        applicationUser.BirthDate = new DateTime(1900, 01, 01);
                         applicationUser.Email = "admin@gmail.com";
                         applicationUser.PhoneNumber = "2122121212";
                         applicationUser.UserName = "admin";
@@ -69,6 +95,7 @@ namespace SoftitoFlix.Data
                         applicationUser.Passive = false;
 
                         userManager.CreateAsync(applicationUser, "Admin123!").Wait();
+                        userManager.AddToRoleAsync(applicationUser,"Administrator").Wait();
 
                         Claim claim;
 
@@ -76,6 +103,19 @@ namespace SoftitoFlix.Data
                         userManager.AddClaimAsync(applicationUser, claim).Wait();
                     }
                 }
+
+                if (context.UserPlans.Count() == 0)
+                {
+                    userPlan = new UserPlan();
+                    userPlan.PlanId = 1;
+                    userPlan.UserId = 1;
+                    userPlan.StartDate = DateTime.Now;
+                    userPlan.EndDate = DateTime.MaxValue;
+
+                    context.UserPlans.Add(userPlan);
+                }
+
+                context.SaveChanges();
             }
         }
     }

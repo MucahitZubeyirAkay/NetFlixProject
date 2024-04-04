@@ -56,7 +56,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Directors/5
         [HttpPut("{id}")]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult PutDirector(int id,DirectorDto directorDto)
         {
 
@@ -92,7 +92,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Directors
         [HttpPost]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult<Director> PostDirector(DirectorDto directorDto)
         {
 
@@ -117,7 +117,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Directors/5
         [HttpDelete("{id}")]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult DeleteDirector(int id)
         {
           

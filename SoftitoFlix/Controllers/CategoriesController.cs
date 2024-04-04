@@ -47,7 +47,7 @@ namespace SoftitoFlix.Controllers
 
 
         [HttpPost]
-        [Authorize("Administrator")]
+        [Authorize()]
         public ActionResult Post(CategoryDto categoryDto)
         {
             Category category = _mapper.Map<Category>(categoryDto);
@@ -64,7 +64,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpDelete]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult Delete(int id)
         {
             Category? category=_context.Categories.FirstOrDefault(c => c.Id == id);

@@ -33,7 +33,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // GET: api/User
-        [Authorize("Administrator")]
+        [Authorize]
         [HttpGet]
         public ActionResult<List<ApplicationUser>> GetUsers(bool passiveUser=true)
         {
@@ -128,7 +128,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // DELETE: api/User/5
-        [Authorize("CustomerRepresentative")]
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult DeleteApplicationUser(long id)
         {
@@ -172,7 +172,7 @@ namespace SoftitoFlix.Controllers
             {
                 applicationUser.Passive = true;
                 _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
-                return false;
+                return Problem("Sistemize kayıtlı bir üyeliğiniz bulunmamaktadır. Lütfen üyelik ekranında üyelik alıp sonra login olunuz!");
             }       
 
 
@@ -183,22 +183,6 @@ namespace SoftitoFlix.Controllers
 
 
             signInResult = _signInManager.PasswordSignInAsync(applicationUser, logInModel.Password, false, false).Result;
-
-            /*if(signInResult.Succeeded==true)
-            {
-                var mediaCategory = _context.UsersFavoriteMedias.Where(u => u.UserId == applicationUser.Id).Include(u => u.Media!).ThenInclude(u => u.MediaCategories).ToList()
-                .SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
-
-                if (mediaCategory != null)
-                {
-                    IQueryable<int> userWatchEpisode = _context.UsersWatchEpisodes.Where(u => u.UserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
-
-                    IQueryable<Media> mediaQuery = _context.Medias.Include(m => m.MediaCategories!.Where(mc => mc.CategoryId == mediaCategory.Key)).Where(m => userWatchEpisode.Contains(m.Id) == false);
-
-                    //Gelen önerileri burda yaş kısıtlamasına göre kontrol et.
-                }
-
-            }*/
 
             return signInResult.Succeeded;
         }

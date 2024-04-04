@@ -12,7 +12,7 @@ using SoftitoFlix.Data;
 namespace SoftitoFlix.Migrations
 {
     [DbContext(typeof(SoftitoFlixContext))]
-    [Migration("20240403115340_InitialCreate")]
+    [Migration("20240404150706_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

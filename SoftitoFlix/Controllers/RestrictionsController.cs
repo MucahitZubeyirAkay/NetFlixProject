@@ -54,7 +54,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Restrictions/5
         [HttpPut("{id}")]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult PutRestriction(byte id, RestrictionDto restrictionDto)
         {
             Restriction? restriction = _context.Restrictions.Find(id);
@@ -88,7 +88,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Restrictions
         [HttpPost]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult<Restriction> PostRestriction(int id,RestrictionDto restrictionDto)
         {
             if(restrictionDto == null)

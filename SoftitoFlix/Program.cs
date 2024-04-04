@@ -19,12 +19,13 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
+        builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationWindowsDatabase")));
         builder.Services.AddDefaultIdentity<ApplicationUser>()
+            .AddRoles<ApplicationRole>()
             .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SoftitoFlixContext>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        //builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);//Program çalışıtğında loopa girmesini engelliyor.
+        builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);//Program çalışıtğında loopa girmesini engelliyor.
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -43,7 +44,8 @@ public class Program
 
         SoftitoFlixContext? context = app.Services.CreateScope().ServiceProvider.GetService<SoftitoFlixContext>();
         UserManager<ApplicationUser>? userManager = app.Services.CreateScope().ServiceProvider.GetService<UserManager<ApplicationUser>>();
-        DbInitializer dBInitializer = new DbInitializer(context, userManager);
+        RoleManager<ApplicationRole>? roleManager = app.Services.CreateScope().ServiceProvider.GetService<RoleManager<ApplicationRole>>();
+        DbInitializer dBInitializer = new DbInitializer(context, roleManager, userManager);
 
         app.Run();
     }

@@ -196,7 +196,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Episodes
         [HttpPost]
-        [Authorize("Administrator")]
+        [Authorize]
         public ActionResult<Episode> PostEpisode(EpisodeDto episodeDto)
         {
             Episode episode=_mapper.Map<Episode>(episodeDto);
