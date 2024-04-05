@@ -28,6 +28,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Restrictions
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<List<Restriction>> GetRestrictions()
         {
           if (_context.Restrictions == null)
@@ -39,6 +40,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Restrictions/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Restriction> GetRestriction(byte id)
         {
          
@@ -54,7 +56,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Restrictions/5
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult PutRestriction(byte id, RestrictionDto restrictionDto)
         {
             Restriction? restriction = _context.Restrictions.Find(id);
@@ -88,7 +90,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Restrictions
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Restriction> PostRestriction(int id,RestrictionDto restrictionDto)
         {
             if(restrictionDto == null)

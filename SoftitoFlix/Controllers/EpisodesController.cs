@@ -29,7 +29,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Episodes
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<List<Episode>> GetEpisodes() //Kontrol et.
         {
 
@@ -46,12 +46,12 @@ namespace SoftitoFlix.Controllers
             int ageInYears = (int)(age.TotalDays / 365.25);
 
             
-            var episodes = _context.Episodes.Where(e=>e.Passive==false).Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+            var episodes = _context.Episodes.Where(e=>e.Passive==false).Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).Where(e=> e.Passive==false).ToList();
 
 
             if(episodes==null)
             {
-                if (_context.Episodes.Any(e => e.Passive == false))
+                if (_context.Episodes.Any())
                 {
                     return Problem("Aradığınız içeri izlemek için yaşınız uygun değil.");
                 }
@@ -63,7 +63,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Episodes/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<Episode> GetEpisode(long id)
         {
 
@@ -81,13 +81,13 @@ namespace SoftitoFlix.Controllers
 
             // var episode = _context.Episodes.Find(id);
 
-           var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e=> e.Id==id);
+           var episode = _context.Episodes.Include(e => e.Media).ThenInclude(m => m!.MediaRestrictions).Where(e => e.Media!.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(e=> e.Id==id && e.Passive==false);
 
 
 
             if (episode == null)
             {
-               if(_context.Episodes.Any(e=> e.Id==id && e.Passive==false))
+               if(_context.Episodes.Any(e=> e.Id==id))
                 {
                     return Problem("Aradığınız episode yaşınız için uygun değil. Bu episode için erişim hakkınız yok.");
                 }
@@ -98,7 +98,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpGet("GetWatch/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<Episode> GetWatch(int watchId)
         {
             var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
@@ -155,6 +155,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Episodes/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
         public ActionResult PutEpisode(long id, EpisodeUpdateDto episodeDto)
         {
 
@@ -196,7 +197,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Episodes
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Episode> PostEpisode(EpisodeDto episodeDto)
         {
             Episode episode=_mapper.Map<Episode>(episodeDto);
@@ -209,6 +210,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Episodes/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
         public ActionResult DeleteEpisode(long id)
         {
             var episode = _context.Episodes.Find(id);

@@ -20,10 +20,9 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         builder.Services.AddDbContext<SoftitoFlixContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationWindowsDatabase")));
-        builder.Services.AddDefaultIdentity<ApplicationUser>()
-            .AddRoles<ApplicationRole>()
-            .AddDefaultTokenProviders()
+        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<SoftitoFlixContext>();
+
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);//Program çalışıtğında loopa girmesini engelliyor.
         var app = builder.Build();
@@ -43,8 +42,9 @@ public class Program
         app.MapControllers();
 
         SoftitoFlixContext? context = app.Services.CreateScope().ServiceProvider.GetService<SoftitoFlixContext>();
-        UserManager<ApplicationUser>? userManager = app.Services.CreateScope().ServiceProvider.GetService<UserManager<ApplicationUser>>();
         RoleManager<ApplicationRole>? roleManager = app.Services.CreateScope().ServiceProvider.GetService<RoleManager<ApplicationRole>>();
+        UserManager<ApplicationUser>? userManager = app.Services.CreateScope().ServiceProvider.GetService<UserManager<ApplicationUser>>();
+        SignInManager<ApplicationUser>? signInManager = app.Services.CreateScope().ServiceProvider.GetService<SignInManager<ApplicationUser>>();
         DbInitializer dBInitializer = new DbInitializer(context, roleManager, userManager);
 
         app.Run();

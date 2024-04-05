@@ -62,9 +62,27 @@ namespace SoftitoFlix.Data
                     plan = new Plan();
                     plan.Name = "Admin";
                     plan.Price = 999999999999999999;
-                    
                     context.Plans.Add(plan);
 
+                    plan = new Plan();
+                    plan.Name = "VisitorPlan";
+                    plan.Price = 0;
+                    context.Plans.Add(plan);
+
+                    plan = new Plan();
+                    plan.Name = "SmallPlan";
+                    plan.Price = 100;
+                    context.Plans.Add(plan);
+
+                    plan = new Plan();
+                    plan.Name = "MediumPlan";
+                    plan.Price = 200;
+                    context.Plans.Add(plan);
+
+                    plan = new Plan();
+                    plan.Name = "BigPlan";
+                    plan.Price = 300;
+                    context.Plans.Add(plan);
                 }
 
                 context.SaveChanges();
@@ -73,11 +91,20 @@ namespace SoftitoFlix.Data
                 {
                     if(roleManager.Roles.Count() == 0)
                     {
-                        applicationRole = new ApplicationRole();
-                        applicationRole.Name = "Administrator";
-
+                        applicationRole = new ApplicationRole("Administrator");
                         roleManager.CreateAsync(applicationRole).Wait();
 
+                        applicationRole = new ApplicationRole("VisitorMember");
+                        roleManager.CreateAsync(applicationRole).Wait();
+
+                        applicationRole = new ApplicationRole("SmallPartner");
+                        roleManager.CreateAsync(applicationRole).Wait();
+
+                        applicationRole = new ApplicationRole("MediumPartner");
+                        roleManager.CreateAsync(applicationRole).Wait();
+
+                        applicationRole = new ApplicationRole("BigPartner");
+                        roleManager.CreateAsync(applicationRole).Wait();
                     }
                     
                 }
@@ -100,6 +127,9 @@ namespace SoftitoFlix.Data
                         Claim claim;
 
                         claim = new Claim("BirthDate", applicationUser.BirthDate.ToString(), ClaimValueTypes.Date);
+                        userManager.AddClaimAsync(applicationUser, claim).Wait();
+
+                        claim = new Claim("Id", applicationUser.Id.ToString());
                         userManager.AddClaimAsync(applicationUser, claim).Wait();
                     }
                 }

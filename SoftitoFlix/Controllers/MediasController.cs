@@ -28,7 +28,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Medias
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<List<Media>> GetNotPassiveMedias()
         {
             var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
@@ -45,11 +45,11 @@ namespace SoftitoFlix.Controllers
             int ageInYears = (int)(age.TotalDays / 365.25);
 
 
-            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.Passive==false && m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.Passive==false && m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).Where(m=> m.Passive==false).ToList();
 
             if (media == null)
             {
-                if (_context.Medias.Any(m=> m.Passive == false))
+                if (_context.Medias.Any())
                 {
                     return Problem("Aradığınız media yaşınız için uygun değil!Bu media için erişim hakkınız yok");
                 }
@@ -60,7 +60,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpGet("passive")]
-        [Authorize("Administrator")]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<List<Media>> PassiveMedias()
         {
 
@@ -77,7 +77,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Medias/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<Media> GetMedia(int id)
         {
            
@@ -94,12 +94,12 @@ namespace SoftitoFlix.Controllers
 
             int ageInYears = (int)(age.TotalDays / 365.25);
 
-            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(m=> m.Id == id);
+            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(m=> m.Id == id && m.Passive==false);
 
 
             if (media == null)
             {
-                if(_context.Medias.Any(m=> m.Id==id && m.Passive==false))
+                if(_context.Medias.Any(m=> m.Id==id))
                 {
                     return Problem("Aradığınız media yaşınız için uygun değil!Bu media için erişim hakkınız yok");
                 }
@@ -111,7 +111,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Medias/5
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult PutMedia(int id, MediaUpdateDto mediaDto)
         {
 
@@ -146,7 +146,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpPut("updatePassive/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Media> PutPassiveMediaActive(int id)
         {
             Media? media = _context.Medias.Find(id);
@@ -170,7 +170,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Medias
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Media> PostMedia(MediaDto mediaDto)
         {
             Media media = _mapper.Map<Media>(mediaDto);
@@ -183,7 +183,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Medias/5
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult DeleteMedia(int id)
         {
            Media? media = _context.Medias.Find(id);

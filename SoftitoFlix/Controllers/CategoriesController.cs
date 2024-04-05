@@ -27,6 +27,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<List<Category>> GetCategories()
         {
             List<Category> categories = _context.Categories.ToList();
@@ -35,6 +36,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<Category> GetCategory(int id)
         {
             Category? category = _context.Categories.FirstOrDefault(c => c.Id == id);
@@ -45,9 +47,39 @@ namespace SoftitoFlix.Controllers
             return category;
         }
 
+        [HttpGet("/category{id}")]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
+        public ActionResult<List<MediaCategory>> GetCategoryAllMedias(int id)                          //KontrolEt
+        {
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
+
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
+            {
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
+            }
+
+
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            // Kategoriye ait tüm medyaları çek
+
+            var mediasCategories = _context.MediaCategories.Include(mc => mc.Media).ThenInclude(m => m!.MediaRestrictions).Where(mc => mc.CategoryId == id && mc.Media!.Passive == false && mc.Media.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+
+            if(mediasCategories==null || mediasCategories.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return mediasCategories;
+
+        }
+
 
         [HttpPost]
-        [Authorize()]
+        [Authorize(Roles = "Administrator")]
         public ActionResult Post(CategoryDto categoryDto)
         {
             Category category = _mapper.Map<Category>(categoryDto);
@@ -64,7 +96,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpDelete]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult Delete(int id)
         {
             Category? category=_context.Categories.FirstOrDefault(c => c.Id == id);
@@ -73,6 +105,12 @@ namespace SoftitoFlix.Controllers
             {
                 return NotFound("İşlem yapmaya çalıştığınız kategori bulunamadı!");
             }
+
+            if(_context.MediaCategories.Any(mc=> mc.CategoryId==id))
+            {
+                return BadRequest("Silmeye çalıştığınız kategoriye ait filmler var. Onlar silinmeden kategoriyi silemezsiniz!");
+            }
+
             _context.Categories.Remove(category);
             _context.SaveChanges();
 

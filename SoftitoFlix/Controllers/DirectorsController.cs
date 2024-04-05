@@ -28,6 +28,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Directors
         [HttpGet]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<List<Director>> GetDirectors()
         {
             List<Director> directors = _context.Directors.ToList();
@@ -41,6 +42,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Directors/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<Director> GetDirector(int id)
         {
           Director? director = _context.Directors.FirstOrDefault(d => d.Id == id);
@@ -56,7 +58,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Directors/5
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult PutDirector(int id,DirectorDto directorDto)
         {
 
@@ -92,7 +94,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Directors
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Director> PostDirector(DirectorDto directorDto)
         {
 
@@ -117,7 +119,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Directors/5
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult DeleteDirector(int id)
         {
           

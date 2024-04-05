@@ -29,6 +29,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Stars
         [HttpGet]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<List<Star>> GetStars()
         {
             List<Star> star = _context.Stars.ToList();
@@ -42,6 +43,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Stars/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<Star> GetStar(int id)
         {
             Star? star = _context.Stars.FirstOrDefault(s => s.Id == id);
@@ -58,6 +60,7 @@ namespace SoftitoFlix.Controllers
         // PUT: api/Stars/5
         [HttpPut("{id}")]
         [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult PutStar(int id, StarDto starDto)
         {
             Star? star = _context.Stars.Find(id);
@@ -92,7 +95,7 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Stars
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<Star> PostStar(StarDto starDto)
         {
            
@@ -117,7 +120,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Stars/5
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public ActionResult DeleteStar(int id)
         {
             var star = _context.Stars.Find(id);

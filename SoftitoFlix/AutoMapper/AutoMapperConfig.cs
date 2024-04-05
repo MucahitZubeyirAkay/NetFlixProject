@@ -14,6 +14,7 @@ namespace SoftitoFlix.AutoMapper
 			CreateMap<Restriction, RestrictionDto>().ReverseMap();
 			CreateMap<Media, MediaDto>().ReverseMap();
 			CreateMap<Episode, EpisodeDto>().ReverseMap();
+			CreateMap<ApplicationUser, UserDto>().ReverseMap().ForMember(dest => dest.RegisterDate, opt => opt.MapFrom(src => DateTime.Now)).ForMember(dest => dest.Passive, opt => opt.MapFrom(src => false));
 		}
 	}
 }
