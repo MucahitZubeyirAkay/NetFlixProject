@@ -12,7 +12,7 @@ using SoftitoFlix.Data;
 namespace SoftitoFlix.Migrations
 {
     [DbContext(typeof(SoftitoFlixContext))]
-    [Migration("20240404230058_InitialCreate")]
+    [Migration("20240405092246_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -421,14 +421,15 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("Passive")
+                        .HasColumnType("bit");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
                     b.Property<string>("Resolution")
-                        .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
                     b.HasKey("Id");

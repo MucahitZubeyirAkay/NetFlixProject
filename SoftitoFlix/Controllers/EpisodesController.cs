@@ -129,8 +129,6 @@ namespace SoftitoFlix.Controllers
 
             episode.ViewCount += 1;
 
-            _context.Episodes.Update(episode);
-            
 
             UserWatchEpisode userWatched = new UserWatchEpisode();
 
@@ -146,10 +144,17 @@ namespace SoftitoFlix.Controllers
 
             userWatched.EpisodeId = watchId;
 
-            _context.UsersWatchEpisodes.Update(userWatched);   //Burası çalışmıyor tabloda ekstra ApplicationUserId var onu kaldır.
+            try
+            {
+                _context.UsersWatchEpisodes.Update(userWatched);
+            }
+            catch(Exception ex)
+            {
+                return Problem($"{ex.Message}");
+            }
+            
             _context.SaveChanges();
 
-            
             return episode; 
         }
 
@@ -202,10 +207,18 @@ namespace SoftitoFlix.Controllers
         {
             Episode episode=_mapper.Map<Episode>(episodeDto);
 
-            _context.Episodes.Add(episode);
-            _context.SaveChanges();
+            try
+            {
+                _context.Episodes.Add(episode);
+                _context.SaveChanges();
 
-            return Ok("Episode eklendi!");
+                return Ok("Episode eklendi!");
+            }
+            catch (Exception ex)
+            {
+                return Problem($"{ex.Message}");
+            }
+
         }
 
         // DELETE: api/Episodes/5

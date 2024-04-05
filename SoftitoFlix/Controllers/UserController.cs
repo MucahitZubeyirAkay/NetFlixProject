@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
 using SoftitoFlix.Models.Dtos;
@@ -239,15 +240,63 @@ namespace SoftitoFlix.Controllers
             return Ok("Hesabınız silinmiştir.");
         }
 
+        [HttpGet("/suggestion")]
+        [Authorize(Roles = "SmallPartner, MediumPartner, BigPartner")]
+        public ActionResult<List<Media>> Suggestion()
+        {
+            var id = User.Claims.First(c => c.Type == "Id").Value;
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
+
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
+            {
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
+            }
+
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            //var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+
+
+            ApplicationUser applicationUser = _context.Users.Find(id)!;
+
+            List<UserFavoriteMedia> userFavorites;
+            userFavorites = _context.UsersFavoriteMedias.Where(u => u.UserId == applicationUser.Id).Include(u => u.Media).Include(u => u.Media!.MediaCategories).ToList();
+            IGrouping<short, MediaCategory>? mediaCategories = userFavorites.SelectMany(u => u.Media!.MediaCategories!).GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();
+            if(mediaCategories!=null)
+            {
+                IQueryable<int> userWatcheds = _context.UsersWatchEpisodes.Where(u => u.ApplicationUserId == applicationUser.Id).Include(u => u.Episode).Select(u => u.Episode!.MediaId).Distinct();
+                IQueryable<Media> mediaQuery = _context.Medias.Include(m => m.MediaCategories).Where(m => m.MediaCategories!.Any(mc => mc.CategoryId == mediaCategories.Key) && !userWatcheds.Contains(m.Id));
+
+                var notRestrictionMedia = mediaQuery.Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears));
+
+                if (notRestrictionMedia != null)
+                {
+                    return notRestrictionMedia.ToList();
+                }
+
+                var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+                return media;
+            }
+
+            return NotFound("Size uygun bir film bulunamadı!");
+
+        }
+
         [HttpPost("Login")]
         public  ActionResult Login(LogInModel logInModel)
         {
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
             ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.UserName).Result;
 
-            if (applicationUser == null || applicationUser.Passive==true)
+            if (applicationUser.UserName != "Administrator")
             {
-                return NotFound("Kullanıcı bulunamadı");
+                if (applicationUser == null || applicationUser.Passive == true)
+                {
+                    return NotFound("Kullanıcı bulunamadı");
+                }
             }
 
 
@@ -257,7 +306,6 @@ namespace SoftitoFlix.Controllers
             {
                 if (_context.UserPlans.Where(u => u.UserId == applicationUser.Id && u.EndDate >= DateTime.Today).Any() == false)
                 {
-
                     UserPlan userPlan = new UserPlan();
                     userPlan.UserId = applicationUser.Id;
                     userPlan.PlanId = 2;
@@ -283,30 +331,7 @@ namespace SoftitoFlix.Controllers
             _signInManager.SignOutAsync().Wait();
         }
 
-        [HttpGet("/adminLogut{id}")]
-        [Authorize(Roles = "Administrator")]
-        public ActionResult AdminLogOut(long id) //Hocaya sor
-        {
-            if(!_context.Users.Any(u=> u.Id==id))
-            {
-                return NotFound("Böyle bir kullanıcı bulunamadı!");
-            }
-            // ID'si verilmiş kullanıcı ile ilişkilendirilmiş oturumları bul.
-            var userSessions = _signInManager.Context.User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier && c.Value == id.ToString()).Select(c => c.Subject?.FindFirst("sid")?.Value).ToList();
-
-            if (!userSessions.Any()) //Kullanıcının aktif bir oturumu var mı diye kontrol ediyoruz.
-            {
-                return BadRequest("Kullanıcın aktif bir oturumu bulunmuyor!");
-            }
-
-             // Her bir oturumu sonlandır
-             foreach (var sessionId in userSessions)
-             {
-                 _signInManager.Context.SignOutAsync(sessionId);
-             }
-
-            return Ok("Kullanıcının tüm oturumları sonladırıldı.");
-        }
+        
 
         private bool ApplicationUserExists(long id)
         {

@@ -47,7 +47,7 @@ namespace SoftitoFlix.Controllers
             return category;
         }
 
-        [HttpGet("/category{id}")]
+        [HttpGet("/categoryMedias{id}")]
         [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
         public ActionResult<List<MediaCategory>> GetCategoryAllMedias(int id)                          //KontrolEt
         {
@@ -66,9 +66,14 @@ namespace SoftitoFlix.Controllers
 
             // Kategoriye ait tüm medyaları çek
 
-            var mediasCategories = _context.MediaCategories.Include(mc => mc.Media).ThenInclude(m => m!.MediaRestrictions).Where(mc => mc.CategoryId == id && mc.Media!.Passive == false && mc.Media.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+            //var mediasCategories = _context.MediaCategories.Include(mc => mc.Media).ThenInclude(m => m!.MediaRestrictions).Where(mc => mc.CategoryId == id && mc.Media!.Passive == false && mc.Media.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).ToList();
+            var mediasCategories = _context.MediaCategories.Include(mc => mc.Media)
+            .ThenInclude(m => m!.MediaRestrictions)
+            .Where(mc => mc.CategoryId == id && !mc.Media!.Passive && mc.Media.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears))
+            .ToList();
 
-            if(mediasCategories==null || mediasCategories.Count == 0)
+
+            if (mediasCategories==null || mediasCategories.Count == 0)
             {
                 return NotFound();
             }

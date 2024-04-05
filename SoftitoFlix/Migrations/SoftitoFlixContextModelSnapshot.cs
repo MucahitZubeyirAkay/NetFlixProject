@@ -419,14 +419,15 @@ namespace SoftitoFlix.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("Passive")
+                        .HasColumnType("bit");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
                     b.Property<string>("Resolution")
-                        .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
                     b.HasKey("Id");

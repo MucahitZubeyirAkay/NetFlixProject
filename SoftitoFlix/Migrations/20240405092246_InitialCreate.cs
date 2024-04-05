@@ -103,9 +103,10 @@ namespace SoftitoFlix.Migrations
                 {
                     Id = table.Column<short>(type: "smallint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
-                    Resolution = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true)
+                    Resolution = table.Column<string>(type: "varchar(20)", nullable: true),
+                    Passive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -62,26 +62,31 @@ namespace SoftitoFlix.Data
                     plan = new Plan();
                     plan.Name = "Admin";
                     plan.Price = 999999999999999999;
+                    plan.Passive = false;
                     context.Plans.Add(plan);
 
                     plan = new Plan();
                     plan.Name = "VisitorPlan";
                     plan.Price = 0;
+                    plan.Passive = false;
                     context.Plans.Add(plan);
 
                     plan = new Plan();
                     plan.Name = "SmallPlan";
                     plan.Price = 100;
+                    plan.Passive = false;
                     context.Plans.Add(plan);
 
                     plan = new Plan();
                     plan.Name = "MediumPlan";
                     plan.Price = 200;
+                    plan.Passive = false;
                     context.Plans.Add(plan);
 
                     plan = new Plan();
                     plan.Name = "BigPlan";
                     plan.Price = 300;
+                    plan.Passive = false;
                     context.Plans.Add(plan);
                 }
 
