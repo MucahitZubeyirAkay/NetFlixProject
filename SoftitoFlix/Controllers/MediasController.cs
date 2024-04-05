@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -108,6 +109,84 @@ namespace SoftitoFlix.Controllers
 
             return media;
         }
+
+        [HttpPost("/putFavoriteMediaAdd")]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
+        public ActionResult FavoriteMediaAdd(int id)
+        {
+            var userBirthClaim = User.Claims.FirstOrDefault(c => c.Type == "BirthDate");
+
+            var userIdd = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (userBirthClaim == null || !DateTime.TryParse(userBirthClaim.Value, out DateTime userBirth))
+            {
+                // Doğum tarihi claim'i alınamadı veya geçerli bir tarih değilse hata döndür.
+                return BadRequest("Kullanıcının doğum tarihi bilgisi geçersiz veya eksik.");
+            }
+
+
+            TimeSpan age = DateTime.Now - userBirth;
+
+            int ageInYears = (int)(age.TotalDays / 365.25);
+
+            var media = _context.Medias.Include(m => m.MediaRestrictions).Where(m => m.MediaRestrictions!.Any(mr => mr.RestrictionId <= ageInYears)).FirstOrDefault(m => m.Id == id && m.Passive == false);
+
+            if(media==null)
+            {
+                return NotFound("İlgili medya bulunamadı!");
+            }
+
+
+            UserFavoriteMedia userFavoriteMedia = new UserFavoriteMedia();
+
+            userFavoriteMedia.UserId = userIdd;
+            userFavoriteMedia.MediaId = media.Id;
+
+            try
+            {
+              _context.UsersFavoriteMedias.Add(userFavoriteMedia);
+            }
+            catch(Exception ex)
+            {
+                return Problem($"İşlem başarısız. {ex.Message}");
+            }
+
+
+            _context.SaveChanges();
+
+            return Ok("Favori medya eklendi");
+
+        }
+
+        [HttpDelete("/deleteFavoriteMedia")]
+        [Authorize(Roles = "Administrator, SmallPartner, MediumPartner, BigPartner")]
+        public ActionResult DeleteFavoriteMedia(int mediaId)
+        {
+            var userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+            var userMedia = _context.UsersFavoriteMedias.Where(um => um.UserId == userId && um.MediaId == mediaId).FirstOrDefault();
+
+            if(userMedia==null)
+            {
+                return NotFound("Silmek istediğiniz kullanıcı favori medyası bulunamadı!");
+            }
+            try
+            {
+                _context.UsersFavoriteMedias.Remove(userMedia);
+            }
+            catch(Exception ex)
+            {
+                return Problem($"İşlem başarısız. {ex.Message}");
+            }
+
+
+            _context.SaveChanges();
+
+            return Ok("İstediğinin user favori medyası silindi");
+        }
+
+
 
         // PUT: api/Medias/5
         [HttpPut("{id}")]
